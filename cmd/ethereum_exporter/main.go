@@ -12,6 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"time"
 )
 
 func main() {
@@ -43,21 +44,19 @@ func main() {
 
 	registry := prometheus.NewPedanticRegistry()
 	registry.MustRegister(
-		collector.NewNetPeerCount(rpc),
 		collector.NewEthBlockNumber(rpc),
-		collector.NewEthGasPrice(rpc),
-		collector.NewEthEarliestBlockTransactions(rpc),
 		collector.NewEthLatestBlockTransactions(rpc),
 		collector.NewEthPendingBlockTransactions(rpc),
-		collector.NewEthHashrate(rpc),
-		collector.NewEthSyncing(rpc),
-		collector.NewParityNetPeers(rpc),
+		collector.NewNetPeerCount(rpc),
+		collector.NewLastBlockSeconds(rpc),
 	)
 
 	handler := promhttp.HandlerFor(registry, promhttp.HandlerOpts{
 		ErrorLog:      log.New(os.Stderr, log.Prefix(), log.Flags()),
 		ErrorHandling: promhttp.ContinueOnError,
 	})
+
+	log.Printf("Started listening %s\n", time.Now())
 
 	http.Handle("/metrics", handler)
 	log.Fatal(http.ListenAndServe(*addr, nil))
