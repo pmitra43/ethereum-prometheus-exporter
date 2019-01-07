@@ -5,7 +5,7 @@ COPY . .
 
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -ldflags '-s -w' github.com/pmitra43/ethereum-prometheus-exporter/cmd/ethereum_exporter
 
-FROM scratch
+FROM ubuntu:xenial
 
 USER nobody
 EXPOSE 9368
