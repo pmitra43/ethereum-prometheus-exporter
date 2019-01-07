@@ -35,9 +35,14 @@ func (collector *LastBlockSeconds) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
+	value := getBlockCreationTimeInSecondsFromResult(result)
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+}
+
+func getBlockCreationTimeInSecondsFromResult(result json.RawMessage) float64 {
 	var head *types.Header
 	json.Unmarshal(result, &head)
 	pow := math.Pow(10, 9)
-	value := float64(head.Time.Int64())/pow
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+	value := float64(head.Time.Int64()) / pow
+	return value
 }
